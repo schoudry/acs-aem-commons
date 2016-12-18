@@ -110,19 +110,32 @@
                 actionUrl = $form.attr("action") + ".json",
                 mValues, $field, name, $multifield;
 
-            $(".js-coral-Multifield-add").click(function(){
-                $multifield = $(this).parent();
+            var $outerAdd = $("[" + cmf.DATA_ACS_COMMONS_NESTED + "]")
+                                    .closest(".coral-Multifield-list").next(".js-coral-Multifield-add");
 
-                setTimeout(function(){
-                    cmf.addCompositeMultifieldRemoveListener($multifield);
-                    cmf.addCompositeMultifieldValidator();
-                }, 500);
+            $outerAdd.click(function(){
+                _.defer(function(){
+                    $multifield = $("[" + cmf.DATA_ACS_COMMONS_NESTED + "]:last");
+
+                    addUniqueIdsToInputs($multifield);
+
+                    var $innerAdd = $multifield.find(".js-coral-Multifield-add");
+
+                    $innerAdd.click(function(){
+                        var $addButton = $(this);
+
+                        _.defer(function(){
+                            $multifield = $addButton.parent();
+
+                            addUniqueIdsToInputs($multifield);
+                        });
+                    })
+                });
             });
 
             if (_.isEmpty($fieldSets)) {
                 return;
             }
-
 
             $fieldSets.each(function (i, fieldSet) {
                 if(!cmf.isJsonStore($(fieldSet).data(cmf.ACS_COMMONS_NESTED))){
@@ -202,9 +215,23 @@
                     });
                 });
 
-                $document.trigger("touchui-composite-multifield-ready", mNames);
+                _.defer(function(){
+                    _.each($("[" + cmf.DATA_ACS_COMMONS_NESTED + "]"), function(multifield){
+                        addUniqueIdsToInputs($(multifield));
+                    });
 
-                cmf.addCompositeMultifieldValidator();
+                    $document.trigger("touchui-composite-multifield-ready", mNames);
+                });
+            }
+
+            function addUniqueIdsToInputs($multifield){
+                $multifield.find("input,textarea").each(function(){
+                    var id = cmf.getUniqueID();
+
+                    $(this).attr("id", id);
+
+                    cmf.addCompositeMultifieldValidator(id);
+                });
             }
 
             $.ajax(actionUrl).done(postProcess);

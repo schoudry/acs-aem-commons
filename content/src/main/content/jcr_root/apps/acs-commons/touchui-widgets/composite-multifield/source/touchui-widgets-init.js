@@ -137,6 +137,16 @@
             return (name === this.NODE_STORE);
         },
 
+        getUniqueID: function(){
+            var d = new Date().getTime();
+
+            return "acs-multi-" + 'xxxx-xxxx-xxxx-xxxx'.replace(/[x]/g, function(c) {
+                var r = (d + Math.random() * 16) % 16 | 0;
+                d = Math.floor(d / 16);
+                return (c == 'x' ? r : (r & 0x7 | 0x8)).toString(16);
+            });
+        },
+
         addCompositeMultifieldRemoveListener: function($multifield){
             var cmf = this;
 
@@ -147,11 +157,11 @@
             });
         },
 
-        addCompositeMultifieldValidator: function(){
+        addCompositeMultifieldValidator: function(id){
             var fieldErrorEl = $("<span class='coral-Form-fielderror coral-Icon coral-Icon--alert coral-Icon--sizeS' " +
                     "data-init='quicktip' data-quicktip-type='error' />"),
                 cmf = this,
-                selector = "[" + cmf.DATA_ACS_COMMONS_NESTED + "] >* input, [" + cmf.DATA_ACS_COMMONS_NESTED + "] >* textarea";
+                selector = "#" + id;
 
             $.validator.register({
                 selector: selector,
