@@ -171,22 +171,16 @@
             });
 
             function validate($el){
-                var $multifield = $el.closest(".coral-Multifield"),
-                    $inputs = $multifield.find("input, textarea"),
-                    $input, isRequired, message = null;
+                var $input = $el, isRequired, message;
 
-                $inputs.each(function(index, input){
-                    $input = $(input);
+                isRequired = $input.attr("required") || ($input.attr("aria-required") === "true");
 
-                    isRequired = $input.attr("required") || ($input.attr("aria-required") === "true");
-
-                    if (isRequired && $input.val().length === 0) {
-                        $input.addClass("is-invalid");
-                        message = "Please fill the required multifield items";
-                    }else{
-                        $input.removeClass("is-invalid");
-                    }
-                });
+                if (isRequired && $input.val().length === 0) {
+                    $input.addClass("is-invalid");
+                    message = "Please fill the required multifield items";
+                }else{
+                    $input.removeClass("is-invalid");
+                }
 
                 if(message){
                     $(".cq-dialog-submit").attr("disabled", "disabled");
